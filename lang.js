@@ -1,38 +1,3 @@
-/*
-    Lang is to be a widely available modular language whose operators and core functionality can be utilized as a mesh
-*/
-
-var Lang = function(parser) {
-    this.parser = parser;
-};
-var __escaped_chars;
-var __native_lang_parser = function() { };
-
-//(function(){
-//
-
-var temp_delim = String.fromCharCode(9883);
-var r_num = /(?:NaN|-?((\d*\.\d+|\d+)([Ee][+-]?\d+)?|Infinity))/g;
-
-function _obj(exp) {
-    this.exp = exp;
-    
-    var m = match(exp, /[A-Za-z]+/g);
-    var es = exp.substring(m.index + m.value.length);
-    
-    this.type = m.value.toLowerCase();
-    this.value = _parseValue(this.type, es);
-}
-
-function _parseValue(ty, s) {
-    if (ty.replace(/string|s/g, "") == "") {
-        
-    }
-}
-
-// ///////////////
-/* String Related (Largely Pertaining to Regex) */
-
 function conform_matches_string(mas, s) {
     for (var i in mas) {
         var m = mas[i];
