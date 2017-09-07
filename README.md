@@ -23,5 +23,3 @@ An extension of regex which makes it easy to match, replace, and split complex e
 *Match a section of a string 'string' with a start pattern 'start' and end pattern 'end' while ignoring non-recursive delimiters created by the regex 'ignore'*
 
 `matchSection(string, start, end, ignore)`
-
-*A JavaScript Project by Steven O'Riley*
