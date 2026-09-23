@@ -1,0 +1,37 @@
+{
+  "name": "lang",
+  "version": "1.0.0",
+  "description": "A string matcher which extends regex to match around delimiters or recursively-nested brackets",
+  "license": "MIT",
+  "author": "Steven O'Riley",
+  "main": "scripts/lang.js",
+  "module": "lang.mjs",
+  "types": "lang.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lang.d.ts",
+      "import": "./lang.mjs",
+      "require": "./scripts/lang.js"
+    }
+  },
+  "files": [
+    "scripts/lang.js",
+    "lang.mjs",
+    "lang.d.ts",
+    "README.md",
+    "LICENSE.md"
+  ],
+  "scripts": {
+    "test": "node test/run.js",
+    "build": "node build-mjs.js"
+  },
+  "keywords": [
+    "regex",
+    "split",
+    "replace",
+    "brackets",
+    "nested",
+    "delimiter",
+    "tokenize"
+  ]
+}
