@@ -3,11 +3,64 @@
     <head>
         <title>Lang</title>
         
+        <meta name="viewport" content="width=device-width,height=device-height" />
         <script src="scripts/lang.js"></script>
         <script src="scripts/main.js"></script>
+        <style>
+            body { font:15px Verdana; margin:8px; background:linear-gradient(to bottom right, white, lightblue); min-height:100vh; }
+            input, select, textarea, button { font:14px Verdana; }
+            input[type=text] { width:220px; }
+            input.short { width:60px; }
+            textarea { width:100%; box-sizing:border-box; height:90px; font:14px Menlo, Consolas, monospace; }
+            label { display:inline-block; margin:2px 10px 2px 0; }
+            .panel { display:inline-block; vertical-align:top; background:radial-gradient(white, lightgray); border:1px solid gray; border-radius:3px; padding:6px; margin:4px; box-shadow:5px 5px 5px rgba(100, 100, 100, .4); max-width:100%; box-sizing:border-box; }
+            pre { font:14px Menlo, Consolas, monospace; white-space:pre-wrap; word-break:break-all; background:white; border:1px solid gray; border-radius:3px; padding:6px; margin:4px 0; min-height:20px; }
+            .m { background:rgba(50, 200, 50, .35); border-bottom:2px solid green; }
+            .m.odd { background:rgba(50, 50, 255, .2); border-bottom-color:blue; }
+            .cut { background:rgba(200, 50, 50, .35); border-bottom:2px solid red; }
+            .tok { border-bottom:2px solid gray; }
+            .sec { background:rgba(50, 200, 50, .25); }
+            .sec b { background:rgba(50, 200, 50, .6); }
+            .unknown { background:rgba(200, 50, 50, .35); }
+            #error { color:darkred; }
+            .hint { color:gray; font-size:12px; }
+            #legend span { display:inline-block; margin-right:8px; padding:0 4px; border-radius:3px; }
+        </style>
     </head>
     
     <body>
-        
+        <div class="panel" style="width:100%">
+            <b>lang</b> <span class="hint">regex that matches around quoted strings and nested brackets. Everything below updates as you type.</span><br />
+            <textarea id="input">This is (some '( )))))' "(moar parenthesis ((( ((() ) ( )" (test) text) ')' hello</textarea>
+        </div>
+        <div class="panel">
+            <label>Function: <select id="mode">
+                <option value="matches">matches(string, regex)</option>
+                <option value="split">split(string, regex, ignore)</option>
+                <option value="split_delims">split_delims(string, regex, start, end, ignore)</option>
+                <option value="replace">replace(string, regex, replacement, ignore)</option>
+                <option value="replace_delims">replace_delims(string, regex, replacement, start, end, ignore)</option>
+                <option value="matchSection" selected>matchSection(string, start, end, ignore)</option>
+                <option value="tokenize">tokenize(string, rules)</option>
+            </select></label><br />
+            
+            <label id="row-regex">regex: /<input type="text" id="regex" value="\s+" />/<input type="text" class="short" id="flags" value="g" /></label>
+            <label id="row-replacement">replacement: <input type="text" id="replacement" value="_" /></label><br />
+            <label id="row-start">start: /<input type="text" class="short" id="start" value="\(" />/</label>
+            <label id="row-end">end: /<input type="text" class="short" id="end" value="\)" />/</label>
+            <label id="row-ignore">ignore: /<input type="text" id="ignore" value="'.*?'|&quot;.*?&quot;" />/ <span class="hint">(blank for none)</span></label><br />
+            <div id="row-rules">
+                rules, one per line: <code>type /regex/flags</code> or <code>type /start/ /end/</code><br />
+                <textarea id="rules">str /'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"/
+group /\(/ /\)/
+word /\w+/</textarea>
+            </div>
+            <div id="error"></div>
+        </div>
+        <div class="panel" style="width:100%">
+            <div id="legend"></div>
+            <pre id="out"></pre>
+            <pre id="result"></pre>
+        </div>
     </body>
 </html>
