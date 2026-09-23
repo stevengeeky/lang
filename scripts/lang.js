@@ -224,6 +224,71 @@ function match(s, r) {
     };
 }
 
+// Cut s into tokens.  Each rule is { type, match } (a regex tried at the
+// current position) or { type, start, end, ignore } (a bracketed section,
+// nested to any depth, with ignore protecting quoted strings inside it).
+// Rules are tried in order; the first that matches wins.  Text matching
+// opts.skip (whitespace unless given) is dropped; anything nothing matches
+// becomes a one-character "unknown" token.
+function tokenize(s, rules, opts) {
+    var skip = opts && "skip" in opts ? opts.skip : /\s+/;
+    var temp = __esc(s).value;
+    var toks = [], pos = 0;
+    
+    while (pos < s.length) {
+        var m = skip ? __matchAt(s, skip, pos) : null;
+        if (m) {
+            pos += m.value.length;
+            continue;
+        }
+        
+        var tok = null;
+        for (var i in rules) {
+            var rule = rules[i], len = 0;
+            if (rule.start)
+                len = __sectionAt(temp, pos, rule.start, rule.end, rule.ignore);
+            else if ((m = __matchAt(s, rule.match, pos)))
+                len = m.value.length;
+            
+            if (len) {
+                tok = { type:rule.type, value:s.substring(pos, pos + len), index:pos };
+                break;
+            }
+        }
+        if (!tok)
+            tok = { type:"unknown", value:String.fromCodePoint(s.codePointAt(pos)), index:pos };
+        
+        toks.push(tok);
+        pos += tok.value.length;
+    }
+    return toks;
+}
+
+// A non-empty match of r beginning exactly at pos, or null
+function __matchAt(s, r, pos) {
+    if (!r)
+        return null;
+    var y = new RegExp(r.source, r.flags.replace(/[gy]/g, "") + "y");
+    y.lastIndex = pos;
+    var m = y.exec(s);
+    if (!m || m[0].length == 0)
+        return null;
+    return { index:pos, value:m[0] };
+}
+
+// Length of the section opened by a at pos (0 if none opens there or it never closes)
+function __sectionAt(temp, pos, a, b, ex) {
+    if (!__matchAt(temp, a, pos))
+        return 0;
+    var rest = temp.substring(pos);
+    var spans = ex ? matches(rest, ex) : [];
+    var msa = __between(rest, a, spans), msb = __between(rest, b, spans);
+    if (msa.length == 0 || msa[0].index != 0 || msb.length == 0)
+        return 0;
+    var end = __matchEndSection(msa, msb);
+    return ~end.index ? end.index + end.value.length : 0;
+}
+
 function __global(r) {
     return new RegExp(r.source, r.flags.indexOf("g") == -1 ? r.flags + "g" : r.flags);
 }
@@ -263,5 +328,5 @@ if (typeof module != "undefined" && module.exports)
         split:split, split_delims:split_delims,
         replace:replace, replace_delims:replace_delims,
         matchSection:matchSection, match:match, matches:matches,
-        conform_matches_string:conform_matches_string
+        tokenize:tokenize, conform_matches_string:conform_matches_string
     };
